@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-# Note to self: This would be an amazing use case for tuples. Maybe remake this project sometime when you're better at coding
+# Note to self: This would be much easier using tuples. Should look into that
 def validate_input(char):
     # Allow only digits
     return char.isdigit()
@@ -69,13 +69,14 @@ def calculate():
         heat_capacity= 385
 
 
-
+#Newtons law of cooling
     k= (transferc * A /(m*heat_capacity))
     T= EnvTemp+(Temp_initial - EnvTemp)*np.exp(-k*t) - 273.15
     T_rounded = round(T, 3)
 
     global Finallabel
 
+# Check if the object temperature is below absolute zero
     if Temp_initial < 0:
         if Finallabel:
             Finallabel.destroy()
@@ -91,6 +92,7 @@ def calculate():
                               font=('Helvetica', 15))
         Finallabel.place(x=500, y=200)
 
+# check if environment temperature is below absolute zero
     if EnvTemp < 0:
         if Finallabel:
             Finallabel.destroy()
@@ -108,7 +110,7 @@ def calculate():
                                 font=('Helvetica', 15))
             Finallabel.place(x=500, y=200)
 
-
+# Plot the temperature over time
     data_t = np.linspace(start=0, stop=int(t), num=1000)
     data_Temp = EnvTemp+(Temp_initial - EnvTemp)*np.exp(-k*data_t) - 273.15
 
@@ -124,6 +126,8 @@ def calculate():
     # Get the canvas widget and pack it into the tkinter window
     canvas.get_tk_widget().place(x=20, y=320)
 
+
+# Make a height entry if cylinder is selected
 def on_dropdown_change(event=None):
     global Heightentry
     global Heightlabel
@@ -174,18 +178,14 @@ drop = tk.OptionMenu(root, clicked3, "Water", "Glass", "Copper")
 drop.place(x=160, y=50)
 clicked3.set("Water")
 
+# Validating input to fix bug
 def validate_input(value_if_allowed):
-    # Allow empty input (to allow deleting characters)
     if value_if_allowed == "":
         return True
-    # Check if the input is a valid float number
     try:
-        # Convert to float
         float(value_if_allowed)
         return True
     except ValueError:
-        # If it's not a valid float, check if it's a partial valid input
-        # Allow single "-"
         if value_if_allowed in ("-", ".", "-.", ".-"):
             return True
         else:
@@ -214,7 +214,7 @@ Tempentry.place(x=162, y=205)
 submit_button = tk.Button(root, text="Calculate", command=calculate)
 submit_button.place(x=700, y=250)
 
-# dropdown environment
+# dropdown menu
 Envilabel = tk.Label(root, text="Environment:", font=('Helvetica', 15))
 Envilabel.place(x=500, y=50)
 
