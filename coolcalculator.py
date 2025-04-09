@@ -11,7 +11,8 @@ def validate_input(char):
     return char.isdigit()
 
 
-
+# stephan boltzmann constant
+sigma = 5.67/(10**8)
 # all input parameters are listed here:
 Volume = 0
 EnvTemp = 0
@@ -59,20 +60,30 @@ def calculate():
     if material == "Water":
         m= 997*Volume
         heat_capacity= 4186
+        epsilon = 0.95
 
     elif material == "Glass":
         m= 2500*Volume
         heat_capacity= 840
+        epsilon= 0.9
 
     elif material == "Copper":
         m= 8850*Volume
         heat_capacity= 385
+        epsilon = 0.05
 
 
 #Newtons law of cooling
     k= (transferc * A /(m*heat_capacity))
     T= EnvTemp+(Temp_initial - EnvTemp)*np.exp(-k*t) - 273.15
-    T_rounded = round(T, 3)
+    
+
+#cooling in space via blackbody radiation (questionable)
+    if envi == "Space":
+        big_constant = 3* sigma * epsilon * A /(m*heat_capacity)
+        T= (big_constant*t + 1/Temp_initial**3)**(1/3)
+        
+    T_rounded = round(T, 3)  
 
     global Finallabel
 
@@ -92,7 +103,7 @@ def calculate():
                               font=('Helvetica', 15))
         Finallabel.place(x=500, y=200)
 
-# check if environment temperature is below absolute zero
+# check if environment temperature is below absolute zero (this implementation is horrible but it worked)
     if EnvTemp < 0:
         if Finallabel:
             Finallabel.destroy()
