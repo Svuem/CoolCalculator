@@ -32,9 +32,9 @@ Finallabel= None
 
 def calculate():
 
-
+    env_temp_input = EnvTempentry.get().strip()
     Volume = float(Volumeentry.get()) / 1000000
-    EnvTemp = float(EnvTempentry.get()) + 273.15
+    EnvTemp = float(env_temp_input) + 273.15 if env_temp_input != '' else 0
     shape = clicked.get()
     envi = clicked2.get()
     material = clicked3.get()
