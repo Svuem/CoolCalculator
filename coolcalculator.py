@@ -5,7 +5,10 @@ import matplotlib.pyplot as plt
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-# Note to self: This would be much easier using tuples. Should look into that
+# Note to self: This would be a good usecase for tuples. Next time maybe put the data as Inputs= ("Shape", "Evnvironment", "Material", T_initial, T_env, Volume, Time))
+# then create a list: Parameters = [transferc, m, heat_capacity, epsilon, A, T_initial, T_env, Volume, Time] and calculate everything with the list entries
+# that would probably be a lot cleaner and easier to read
+
 def validate_input(char):
     # Allow only digits
     return char.isdigit()
@@ -21,9 +24,12 @@ envi = "Air"
 material = "Water"
 Temp_initial= 100
 
-# Calculate Function:
 
 Finallabel= None
+
+# Function to calculate the temperature of the object after a given time
+# using Newton's law of cooling and the Stefan-Boltzmann law for cooling in space
+
 def calculate():
 
 
@@ -35,6 +41,8 @@ def calculate():
     Temp_initial= float(Tempentry.get()) + 273.15
     t=float(Timeentry.get())
 
+    # get heat tranfer coefficients for different environments
+
     if envi == "Air":
         transferc = 25
 
@@ -44,6 +52,7 @@ def calculate():
     elif envi == "Space":
         transferc = 0.1
 
+    #get surface area
 
     if shape == "Sphere":
         r= (3*Volume/(4*math.pi))**(1. /3)
@@ -56,6 +65,8 @@ def calculate():
 
     elif shape == "Cube":
         A= 6*Volume**(2. /3)
+
+    #get some material properties of the object
 
     if material == "Water":
         m= 997*Volume
@@ -73,15 +84,18 @@ def calculate():
         epsilon = 0.05
 
 
-#Newtons law of cooling
-    k= (transferc * A /(m*heat_capacity))
-    T= EnvTemp+(Temp_initial - EnvTemp)*np.exp(-k*t) - 273.15
+
     
 
-#cooling in space via blackbody radiation (questionable)
+#cooling in space via blackbody radiation 
     if envi == "Space":
         big_constant = 3* sigma * epsilon * A /(m*heat_capacity)
-        T= (big_constant*t + 1/Temp_initial**3)**(1/3)
+        T= (big_constant*t + 1/(Temp_initial)**3)**(-1/3) - 273.15
+    
+    else:
+        #Newtons law of cooling
+        k= (transferc * A /(m*heat_capacity))
+        T= EnvTemp+(Temp_initial - EnvTemp)*np.exp(-k*t) - 273.15
         
     T_rounded = round(T, 3)  
 
@@ -122,8 +136,17 @@ def calculate():
             Finallabel.place(x=500, y=200)
 
 # Plot the temperature over time
+
+#first destroy existing plot 
+    plt.close('all')
+
     data_t = np.linspace(start=0, stop=int(t), num=1000)
-    data_Temp = EnvTemp+(Temp_initial - EnvTemp)*np.exp(-k*data_t) - 273.15
+    if envi == "Space":
+        data_Temp= (big_constant*data_t + 1/(Temp_initial)**3)**(-1/3) - 273.15
+    else:
+        data_Temp = EnvTemp+(Temp_initial - EnvTemp)*np.exp(-k*data_t) - 273.15
+
+    
 
     fig, ax = plt.subplots(figsize=(8,5))
     ax.plot(data_t, data_Temp)
@@ -247,4 +270,12 @@ Timelabel.place(x=500, y=150)
 Timeentry = tk.Entry(root, width=10, font=('Helvetica', 12), validate="key", validatecommand=(validate_cmd, "%P"))
 Timeentry.place(x=662, y=155)
 
+# this fixes another bug where the code could only be run once
+
+def on_close():
+    print("Window closed.")
+    plt.close('all')  # Close all matplotlib figures
+    root.destroy()  # Destroy the Tkinter root window
+    
+root.protocol("WM_DELETE_WINDOW", on_close)
 root.mainloop()
