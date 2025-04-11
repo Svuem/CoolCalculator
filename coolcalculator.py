@@ -49,9 +49,6 @@ def calculate():
     elif envi == "Water":
         transferc = 1000
 
-    elif envi == "Space":
-        transferc = 0.1
-
     #get surface area
 
     if shape == "Sphere":
